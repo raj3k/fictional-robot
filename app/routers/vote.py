@@ -1,8 +1,8 @@
 from fastapi import status, HTTPException, Depends, APIRouter, Response
 from sqlalchemy.orm import Session
-from ..database import get_db
-from .. import models, schemas, oauth2
 
+from .. import models, schemas, oauth2
+from ..database import get_db
 
 router = APIRouter(
     prefix="/votes",

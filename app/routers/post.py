@@ -1,10 +1,11 @@
+from typing import List, Optional
+
 from fastapi import status, HTTPException, Depends, APIRouter
 from sqlalchemy import func
 from sqlalchemy.orm import Session
-from typing import List, Optional
-from ..database import get_db
-from .. import models, schemas, oauth2
 
+from .. import models, schemas, oauth2
+from ..database import get_db
 
 router = APIRouter(
     prefix="/posts",
@@ -24,7 +25,7 @@ async def get_posts(db: Session = Depends(get_db), limit: int = 10, skip: int = 
     return posts
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.PostResponse)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.Post)
 async def create_post(post: schemas.PostCreate, db: Session = Depends(get_db),
                       current_user=Depends(oauth2.get_current_user)):
     new_post = models.Post(owner_id=current_user.id, **post.dict())
@@ -57,17 +58,17 @@ async def delete_post(post_id: int, db: Session = Depends(get_db),
     # deleted_post = cursor.fetchone()
     post_query = db.query(models.Post).filter(models.Post.id == post_id)
     post = post_query.first()
-    if not post.first():
+    if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id: {post_id} was not found")
     if post.owner_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to perform requested action")
-    post.delete(synchronize_session="fetch")
+    post_query.delete(synchronize_session="fetch")
     db.commit()
     # conn.commit()
     return f"Post with id: {post_id} deleted successful"
 
 
-@router.put("/{post_id}", response_model=schemas.PostResponse)
+@router.put("/{post_id}", response_model=schemas.Post)
 async def update_post(post_id: int, post_data: schemas.PostCreate, db: Session = Depends(get_db),
                       current_user=Depends(oauth2.get_current_user)):
     # cursor.execute("""UPDATE posts SET title=%s, content=%s, published=%s WHERE id=%s RETURNING *""",
