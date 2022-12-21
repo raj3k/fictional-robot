@@ -13,7 +13,7 @@ services:
       - ALGORITHM=HS256
       - ACCESS_TOKEN_EXPIRE_MINUTES=30
       - DATABASE_USERNAME=postgres
-      - DATABASE_PASSWORD=ZoltriX12
+      - DATABASE_PASSWORD=password123
       - DATABASE_HOSTNAME=postgres
       - DATABASE_PORT=5432
       - DATABASE_NAME=fastapi
@@ -24,7 +24,7 @@ services:
     image: postgres
     restart: always
     environment:
-      - POSTGRES_PASSWORD=ZoltriX12
+      - POSTGRES_PASSWORD=password123
       - POSTGRES_DB=fastapi
     volumes:
       - postgres-db:/var/lib/postgresql/data
